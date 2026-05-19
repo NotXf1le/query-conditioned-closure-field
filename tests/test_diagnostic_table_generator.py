@@ -135,6 +135,27 @@ def test_table_generator_loads_l1_rows(tmp_path) -> None:
     assert mod.l1_isolation_rows(rows)
 
 
+def test_training_curve_summary_includes_100k_budget() -> None:
+    mod = load_table_generator()
+    rows = []
+    for steps in [3000, 10000, 30000, 100000]:
+        rows.append({
+            "_family": "l1_training_budget",
+            "_theme": f"budget_{steps}",
+            "_run_id": f"budget_{steps}_seed_1",
+            "train_steps": str(steps),
+            "transformer_writer_acc": "0.5",
+            "transformer_writer_n": "4",
+            "direct_endpoint_acc": "0.5",
+            "direct_endpoint_n": "4",
+            "grad_norm": "1.0",
+        })
+
+    table = mod.training_curve_summary_rows(rows)
+
+    assert [row[0] for row in table] == ["3000", "10000", "30000", "100000"]
+
+
 def test_pipeline_repair_table_ignores_stale_full_pipeline_rows() -> None:
     mod = load_table_generator()
     rows = [

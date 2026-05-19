@@ -30,3 +30,6 @@ paper/
 
 # Release staging. ZIP assets are uploaded to GitHub Releases, not committed.
 release_assets/
+
+# Local manuscript bundles are not part of the public artifact repository.
+paper.zip

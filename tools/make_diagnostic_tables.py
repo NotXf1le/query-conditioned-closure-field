@@ -750,7 +750,7 @@ def field_ablation_summary_rows(rows: Sequence[Dict[str, object]]) -> List[List[
 
 def training_curve_summary_rows(rows: Sequence[Dict[str, object]]) -> List[List[str]]:
     out: List[List[str]] = []
-    for theme in ["budget_3000", "budget_10000", "budget_30000"]:
+    for theme in ["budget_3000", "budget_10000", "budget_30000", "budget_100000"]:
         group = family_rows(rows, "l1_training_budget", theme)
         if not group:
             continue

@@ -162,7 +162,7 @@ def build_manifest(*, smoke: bool = False, pipeline_repair_only: bool = False) -
             },
         )
 
-    for idx, steps in enumerate([3000, 10000, 30000]):
+    for idx, steps in enumerate([3000, 10000, 30000, 100000]):
         append_k(
             experiments,
             smoke=smoke,

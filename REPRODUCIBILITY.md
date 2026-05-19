@@ -21,7 +21,7 @@ release asset names, and checksums.
 | Core diagnostics | `configs/core_diagnostics_manifest.jsonl` | `runs_core_diagnostics` | 319 done / 21 failed; completed only |
 | Baseline controls | `configs/baseline_controls_manifest.jsonl` | `runs_baseline_controls` | 50 done / 0 failed |
 | Extended diagnostics | `configs/extended_diagnostics_manifest.jsonl` | `runs_extended_diagnostics` | 90 done / 0 failed |
-| L=1 isolation | `configs/l1_isolation_manifest.jsonl` | `runs_l1_isolation` | 300 done / 0 failed |
+| L=1 isolation | `configs/l1_isolation_manifest.jsonl` | `runs_l1_isolation` | 310 done / 0 failed |
 | Pipeline repair | `configs/pipeline_repair_manifest.jsonl` | `runs_pipeline_repair` | 20 done / 0 failed |
 
 Corrected learned-pipeline repair runs supersede earlier metadata-only
@@ -38,6 +38,9 @@ python paper_suite/run_manifest.py --manifest configs/extended_diagnostics_manif
 python paper_suite/run_manifest.py --manifest configs/l1_isolation_manifest.jsonl --out-root runs_l1_isolation --device cuda --workers 1 --resume
 python paper_suite/run_manifest.py --manifest configs/pipeline_repair_manifest.jsonl --out-root runs_pipeline_repair --device cuda --workers 1 --resume
 ```
+
+The current public L=1 budget sweep includes `budget_100000` runs with seeds
+16301--16310.
 
 For a local smoke check:
 

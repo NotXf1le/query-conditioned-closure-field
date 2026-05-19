@@ -28,7 +28,15 @@ def test_l1_full_manifest_uses_k10_public_conditions() -> None:
 
     assert by_theme[("l1_causal_isolation", "direct_qv_write")] == 10
     assert by_theme[("l1_causal_isolation", "field_supervised_mse")] == 10
+    assert by_theme[("l1_training_budget", "budget_100000")] == 10
     assert by_theme[("key_rejection_repair_pipeline", "threshold_null_full_pipeline")] == 10
+
+    budget_100k = [
+        exp for exp in manifest
+        if exp["family"] == "l1_training_budget" and exp["theme"] == "budget_100000"
+    ]
+    assert [exp["args"]["seed"] for exp in budget_100k] == list(range(16301, 16311))
+    assert {exp["args"]["train_steps"] for exp in budget_100k} == {100000}
 
 
 def test_pipeline_repair_only_manifest_uses_corrected_themes() -> None:

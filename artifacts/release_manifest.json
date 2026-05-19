@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "release_tag": "v1.0.0",
+  "release_tag": "v1.1.0",
   "repository": "https://github.com/NotXf1le/query-conditioned-closure-field",
-  "zenodo_doi": "10.5281/zenodo.20279222",
+  "zenodo_doi": "pending",
   "zenodo_concept_doi": "10.5281/zenodo.20279221",
   "generated_at": "2026-05-19",
   "artifact_policy": "Git tracks code, manifests, tests, table generators, and reproducibility metadata. Completed run roots are distributed as GitHub Release assets and archived through Zenodo. Manuscript files and local reports are not committed.",
   "release_assets": [
     {
       "file": "query-conditioned-closure-field-evidence.zip",
-      "bytes": 5327329,
-      "sha256": "3ca13bdb94d5e31d4e4b40e6903ecbf69ed3102f94c00693019accf9eed20c88"
+      "bytes": 5532204,
+      "sha256": "67c332cf3fd2931190f15b6b6d15af0cd40912b3df78dac6d965653c5833bdf8"
     }
   ],
   "evidence_blocks": [
@@ -39,7 +39,7 @@
       "evidence_block": "l1_isolation",
       "manifest": "configs/l1_isolation_manifest.jsonl",
       "run_root": "runs_l1_isolation",
-      "status": "300 done / 0 failed",
+      "status": "310 done / 0 failed",
       "expected_asset": "query-conditioned-closure-field-evidence.zip"
     },
     {
