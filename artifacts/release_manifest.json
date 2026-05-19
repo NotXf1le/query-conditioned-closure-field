@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "release_tag": "v1.0.0",
+  "repository": "https://github.com/NotXf1le/query-conditioned-closure-field",
+  "generated_at": "2026-05-19",
+  "artifact_policy": "Git tracks code, manifests, tests, table generators, and reproducibility metadata. Completed run roots are distributed as GitHub Release assets and archived through Zenodo. Manuscript files and local reports are not committed.",
+  "release_assets": [
+    {
+      "file": "query-conditioned-closure-field-evidence.zip",
+      "bytes": 5327329,
+      "sha256": "3ca13bdb94d5e31d4e4b40e6903ecbf69ed3102f94c00693019accf9eed20c88"
+    }
+  ],
+  "evidence_blocks": [
+    {
+      "evidence_block": "core_diagnostics",
+      "manifest": "configs/core_diagnostics_manifest.jsonl",
+      "run_root": "runs_core_diagnostics",
+      "status": "319 done / 21 failed; completed only",
+      "expected_asset": "query-conditioned-closure-field-evidence.zip"
+    },
+    {
+      "evidence_block": "baseline_controls",
+      "manifest": "configs/baseline_controls_manifest.jsonl",
+      "run_root": "runs_baseline_controls",
+      "status": "50 done / 0 failed",
+      "expected_asset": "query-conditioned-closure-field-evidence.zip"
+    },
+    {
+      "evidence_block": "extended_diagnostics",
+      "manifest": "configs/extended_diagnostics_manifest.jsonl",
+      "run_root": "runs_extended_diagnostics",
+      "status": "90 done / 0 failed",
+      "expected_asset": "query-conditioned-closure-field-evidence.zip"
+    },
+    {
+      "evidence_block": "l1_isolation",
+      "manifest": "configs/l1_isolation_manifest.jsonl",
+      "run_root": "runs_l1_isolation",
+      "status": "300 done / 0 failed",
+      "expected_asset": "query-conditioned-closure-field-evidence.zip"
+    },
+    {
+      "evidence_block": "pipeline_repair",
+      "manifest": "configs/pipeline_repair_manifest.jsonl",
+      "run_root": "runs_pipeline_repair",
+      "status": "20 done / 0 failed",
+      "expected_asset": "query-conditioned-closure-field-evidence.zip"
+    }
+  ],
+  "excluded_from_public_tables": [
+    "smoke runs",
+    "failed runs",
+    "partial runs",
+    "metadata-only rows",
+    "superseded pipeline-label rows for learned-pipeline repair claims"
+  ]
+}

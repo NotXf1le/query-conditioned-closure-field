@@ -1,0 +1,32 @@
+{
+  "title": "Query-Conditioned Closure-Field Writing Under a Single-Read Bottleneck",
+  "upload_type": "software",
+  "description": "Reproducibility artifact for query-conditioned closure-field diagnostics under a single-read bottleneck. The repository contains code, manifests, tests, table generators, and release manifests. Completed run roots are distributed as GitHub Release assets and archived through Zenodo.",
+  "creators": [
+    {
+      "name": "Koba, Felix",
+      "affiliation": "University of Donja Gorica"
+    },
+    {
+      "name": "Cakic, Stevan",
+      "affiliation": "University of Donja Gorica"
+    }
+  ],
+  "license": "MIT",
+  "version": "v1.0.0",
+  "publication_date": "2026-05-19",
+  "keywords": [
+    "differentiable memory",
+    "vector-symbolic binding",
+    "closure fields",
+    "path queries",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/NotXf1le/query-conditioned-closure-field",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}

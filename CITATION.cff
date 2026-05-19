@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the archived release."
+type: software
+title: "Query-Conditioned Closure-Field Writing Under a Single-Read Bottleneck"
+authors:
+  - family-names: "Koba"
+    given-names: "Felix"
+    affiliation: "University of Donja Gorica"
+  - family-names: "Cakic"
+    given-names: "Stevan"
+    affiliation: "University of Donja Gorica"
+repository-code: "https://github.com/NotXf1le/query-conditioned-closure-field"
+license: MIT
+version: "v1.0.0"
+date-released: "2026-05-19"
+abstract: "Reproducibility artifact for query-conditioned closure-field diagnostics under a single-read bottleneck."
+keywords:
+  - differentiable memory
+  - vector-symbolic binding
+  - closure fields
+  - path queries
+  - reproducibility

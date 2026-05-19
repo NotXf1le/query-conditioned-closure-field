@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+
+# Local environments
+.venv/
+venv/
+env/
+
+# Local and generated run outputs
+.tmp/
+tmp/
+runs_*/
+paper_tables*/
+paper/
+
+# LaTeX build byproducts
+*.aux
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Release staging. ZIP assets are uploaded to GitHub Releases, not committed.
+release_assets/
