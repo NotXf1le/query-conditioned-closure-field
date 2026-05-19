@@ -2,7 +2,7 @@
   "schema_version": 1,
   "release_tag": "v1.1.0",
   "repository": "https://github.com/NotXf1le/query-conditioned-closure-field",
-  "zenodo_doi": "pending",
+  "zenodo_doi": "10.5281/zenodo.20294661",
   "zenodo_concept_doi": "10.5281/zenodo.20279221",
   "generated_at": "2026-05-19",
   "artifact_policy": "Git tracks code, manifests, tests, table generators, and reproducibility metadata. Completed run roots are distributed as GitHub Release assets and archived through Zenodo. Manuscript files and local reports are not committed.",

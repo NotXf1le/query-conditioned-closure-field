@@ -56,7 +56,7 @@ Canonical artifact repository:
 <https://github.com/NotXf1le/query-conditioned-closure-field>
 
 The citable artifact is the Zenodo archive of the versioned GitHub Release.
-The `v1.1.0` version DOI is assigned after Zenodo processes the GitHub Release.
+Version DOI: <https://doi.org/10.5281/zenodo.20294661>
 
 Concept DOI: <https://doi.org/10.5281/zenodo.20279221>
 
