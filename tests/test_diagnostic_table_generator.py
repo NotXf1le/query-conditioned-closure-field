@@ -123,8 +123,8 @@ def test_table_generator_loads_l1_rows(tmp_path) -> None:
         encoding="utf-8",
     )
     (run_dir / "CLOSURE_L1_CAUSAL_ISOLATION_RESULTS.csv").write_text(
-        "condition,length,n,transformer_writer_acc,transformer_writer_n,field_mse,wrong_key_old_target_rate,wrong_key_old_target_n,grad_norm\n"
-        "direct_qv_write,1,4,1.0,4,0.0,0.5,4,1.0\n",
+        "condition,length,n,transformer_writer_acc,transformer_writer_n,direct_endpoint_acc,direct_endpoint_n,field_mse,canonical_cos,field_rms,wrong_key_old_target_rate,wrong_key_old_target_n,grad_norm\n"
+        "direct_qv_write,1,4,1.0,4,1.0,4,99.0,0.75,0.25,0.5,4,1.0\n",
         encoding="utf-8",
     )
 
@@ -132,7 +132,11 @@ def test_table_generator_loads_l1_rows(tmp_path) -> None:
 
     assert summary["completed_result_runs"] == 1
     assert rows[0]["_family"] == "l1_causal_isolation"
-    assert mod.l1_isolation_rows(rows)
+    table_rows = mod.l1_isolation_rows(rows)
+    assert table_rows
+    assert "$0.7500\\pm0.0000$" in table_rows[0]
+    assert "$0.2500\\pm0.0000$" in table_rows[0]
+    assert "$99.0000\\pm0.0000$" not in table_rows[0]
 
 
 def test_training_curve_summary_includes_100k_budget() -> None:
@@ -154,6 +158,28 @@ def test_training_curve_summary_includes_100k_budget() -> None:
     table = mod.training_curve_summary_rows(rows)
 
     assert [row[0] for row in table] == ["3000", "10000", "30000", "100000"]
+
+
+def test_field_ablation_summary_uses_scale_aware_field_diagnostics() -> None:
+    mod = load_table_generator()
+    rows = [{
+        "_family": "l1_field_ablation",
+        "_theme": "keydim_96",
+        "_run_id": "run_1",
+        "transformer_writer_acc": "0.5",
+        "transformer_writer_n": "4",
+        "field_mse": "99.0",
+        "canonical_cos": "0.75",
+        "field_rms": "0.25",
+        "wrong_key_old_target_rate": "0.1",
+        "wrong_key_old_target_n": "4",
+    }]
+
+    table_rows = mod.field_ablation_summary_rows(rows)
+
+    assert "$0.7500\\pm0.0000$" in table_rows[0]
+    assert "$0.2500\\pm0.0000$" in table_rows[0]
+    assert "$99.0000\\pm0.0000$" not in table_rows[0]
 
 
 def test_pipeline_repair_table_ignores_stale_full_pipeline_rows() -> None:

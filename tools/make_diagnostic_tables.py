@@ -712,7 +712,8 @@ def l1_isolation_rows(rows: Sequence[Dict[str, object]]) -> List[List[str]]:
             fmt_int(unique_runs(group)),
             fmt_mean_ci(metric_values_by_run(group, "transformer_writer_acc", n_metric="transformer_writer_n")),
             fmt_mean_ci(metric_values_by_run(group, "direct_endpoint_acc", n_metric="direct_endpoint_n")),
-            fmt_mean_ci(metric_values_by_run_unweighted(group, "field_mse")),
+            fmt_mean_ci(metric_values_by_run_unweighted(group, "canonical_cos")),
+            fmt_mean_ci(metric_values_by_run_unweighted(group, "field_rms")),
             fmt_mean_ci(metric_values_by_run(group, "wrong_key_old_target_rate", n_metric="wrong_key_old_target_n")),
             fmt_mean_ci(metric_values_by_run_unweighted(group, "grad_norm")),
         ])
@@ -742,7 +743,8 @@ def field_ablation_summary_rows(rows: Sequence[Dict[str, object]]) -> List[List[
             fmt_acc4(max(values) if values else None),
             median,
             fmt_mean_ci(metric_values_by_run(group, "transformer_writer_acc", n_metric="transformer_writer_n")),
-            fmt_mean_ci(metric_values_by_run_unweighted(group, "field_mse")),
+            fmt_mean_ci(metric_values_by_run_unweighted(group, "canonical_cos")),
+            fmt_mean_ci(metric_values_by_run_unweighted(group, "field_rms")),
             fmt_mean_ci(metric_values_by_run(group, "wrong_key_old_target_rate", n_metric="wrong_key_old_target_n")),
         ])
     return out
@@ -863,6 +865,8 @@ def key_geometry_rows() -> List[List[str]]:
         relpos = [[[-1 if local_rng.random() < 0.5 else 1 for _ in range(dim)] for _ in range(4)] for _ in range(32)]
         wrong_dots: List[float] = []
         max_wrong: List[float] = []
+        reversed_collisions = 0
+        reversed_total = 0
         for _ in range(400):
             L = rng.choice([1, 2, 3, 4, 6, 8, 12, 16, 24, 32])
             source = rng.randrange(48)
@@ -872,7 +876,12 @@ def key_geometry_rows() -> List[List[str]]:
             wrong_source = (source + 1 + rng.randrange(47)) % 48
             variants.append(synthetic_key(wrong_source, rels, key_dim=dim, entity_code=entity, length_code=length, relpos_code=relpos))
             if L > 1:
-                variants.append(synthetic_key(source, list(reversed(rels)), key_dim=dim, entity_code=entity, length_code=length, relpos_code=relpos))
+                reversed_total += 1
+                reversed_key = synthetic_key(source, list(reversed(rels)), key_dim=dim, entity_code=entity, length_code=length, relpos_code=relpos)
+                if abs(dot(q, reversed_key) - 1.0) < 1e-12:
+                    reversed_collisions += 1
+                else:
+                    variants.append(reversed_key)
             swapped = list(rels)
             idx = rng.randrange(L)
             swapped[idx] = (swapped[idx] + 1 + rng.randrange(3)) % 4
@@ -889,8 +898,9 @@ def key_geometry_rows() -> List[List[str]]:
         abs_sorted = sorted(abs(x) for x in wrong_dots)
         p95_abs = abs_sorted[int(0.95 * (len(abs_sorted) - 1))]
         pos_rate = sum(1 for x in wrong_dots if x > 0.0) / len(wrong_dots)
+        collision_rate = reversed_collisions / max(1, reversed_total)
         mean_max = sum(max_wrong) / len(max_wrong)
-        rows.append([str(dim), fmt_acc4(mean), fmt_acc4(sd), fmt_acc4(p95_abs), fmt_acc4(pos_rate), fmt_acc4(mean_max)])
+        rows.append([str(dim), fmt_acc4(sd), fmt_acc4(p95_abs), fmt_acc4(pos_rate), fmt_acc4(collision_rate), fmt_acc4(mean_max)])
     return rows
 
 
@@ -1127,10 +1137,10 @@ def write_outputs(
         ),
         (
             "table_key_geometry",
-            ["Key dim.", "Mean dot", "Std.", r"$95\%\,|\mathrm{dot}|$", r"$\Pr(\mathrm{dot}>0)$", "Mean max sampled wrong-source dot"],
+            ["Key dim.", "Std.", r"$95\%\,|\mathrm{dot}|$", r"$\Pr(\mathrm{dot}>0)$", "Reversed collision rate", "Mean max sampled wrong-source dot"],
             key_geometry_rows(),
             "tab:key-geometry",
-            "Deterministic random-sign key-geometry diagnostic. Positive wrong-key dots are expected under finite-dimensional rank-one keys; without cleanup or rejection, they can preserve an old target under small background logits.",
+            "Nonidentical wrong-key overlap geometry. Reversed-key collisions are exact key matches caused by palindromic relation sequences and are reported separately.",
             "rrrrrr",
             None,
         ),
@@ -1193,22 +1203,22 @@ def write_outputs(
     if l1_table_rows:
         table_specs.append((
             "table_l1_isolation",
-            ["Condition", "K", "Writer", "Direct", "Field MSE", "Wrong-key old", "Grad norm"],
+            ["Condition", "K", "Model", "Direct", "Canon. cos", "Field RMS", "Wrong-key old", "Grad norm"],
             l1_table_rows,
             "tab:l1-isolation",
-            "L=1 causal-isolation campaign. Rows separate pure field writing, text/value mapping, distractor selection, teacher forcing, and field-supervised objectives; values are mean $\\pm$ 95\\% CI over completed runs.",
-            r"p{0.28\textwidth}rccccc",
+            "L=1 causal-isolation campaign. Rows separate pure field writing, text/value mapping, distractor selection, teacher forcing, and field-supervised objectives. Raw Field MSE is retained in artifacts; this table reports scale-aware field diagnostics.",
+            r"p{0.24\textwidth}rcccccc",
             None,
         ))
     l1_ablation_rows = field_ablation_summary_rows(l1_rows)
     if l1_ablation_rows:
         table_specs.append((
             "table_field_ablation_summary",
-            ["Ablation", "K", "Best", "Median", "Mean", "Field MSE", "Wrong-key old"],
+            ["Ablation", "K", "Best", "Median", "Mean", "Canon. cos", "Field RMS", "Wrong-key old"],
             l1_ablation_rows,
             "tab:field-ablation-summary",
-            "Key/field ablations for the L=1 bottleneck campaign. Best and median summarize run-level writer accuracy within each public condition.",
-            r"p{0.24\textwidth}rrrrrr",
+            "Key/field ablations for the L=1 bottleneck campaign. Best and median summarize run-level writer accuracy within each public condition; field diagnostics are scale-aware.",
+            r"p{0.20\textwidth}rrrrrrr",
             None,
         ))
     l1_curve_rows = training_curve_summary_rows(l1_rows)

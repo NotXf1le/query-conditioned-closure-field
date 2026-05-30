@@ -8,9 +8,11 @@ from closure_l1_causal_isolation import (
     L1IsolationConfig,
     VALID_CONDITIONS,
     build_condition_batch,
+    field_alignment_diagnostics,
     make_field,
     run_experiment,
 )
+from closure_writer_diagnostic_ladder import rank_one_target_memory
 
 
 def test_l1_isolation_condition_batches_cover_text_id_and_distractors() -> None:
@@ -39,6 +41,27 @@ def test_l1_isolation_condition_batches_cover_text_id_and_distractors() -> None:
     assert {"direct_qv_write", "field_supervised_mse", "field_supervised_read_ce"} <= VALID_CONDITIONS
 
 
+def test_field_alignment_diagnostics_are_scale_aware() -> None:
+    q = torch.tensor([[1.0, -1.0]], dtype=torch.float32) / torch.sqrt(torch.tensor(2.0))
+    target = torch.tensor([1], dtype=torch.long)
+    target_mem = rank_one_target_memory(q, target, num_entities=3)
+
+    exact = field_alignment_diagnostics(target_mem, target_mem)
+    scaled = field_alignment_diagnostics(3.0 * target_mem, target_mem)
+    zero = field_alignment_diagnostics(torch.zeros_like(target_mem), target_mem)
+
+    orthogonal = torch.zeros_like(target_mem)
+    orthogonal[:, :, 2] = target_mem[:, :, 1]
+    noise = field_alignment_diagnostics(orthogonal, target_mem)
+
+    assert exact["canonical_cos"].item() == pytest.approx(1.0)
+    assert scaled["canonical_cos"].item() == pytest.approx(1.0)
+    assert scaled["field_rms"].item() == pytest.approx(3.0 * exact["field_rms"].item())
+    assert zero["canonical_cos"].item() == pytest.approx(0.0)
+    assert zero["field_rms"].item() == pytest.approx(0.0)
+    assert abs(noise["canonical_cos"].item()) < 1e-6
+
+
 def test_l1_isolation_smoke_run_writes_metrics(tmp_path) -> None:
     cfg = L1IsolationConfig(
         seed=123,
@@ -63,5 +86,7 @@ def test_l1_isolation_smoke_run_writes_metrics(tmp_path) -> None:
     assert row["condition"] == "field_supervised_mse"
     assert "transformer_writer_acc" in row
     assert "field_mse" in row
+    assert "canonical_cos" in row
+    assert "field_rms" in row
     assert "wrong_key_old_target_rate" in row
     assert result["meta"]["train"]["snapshots"]

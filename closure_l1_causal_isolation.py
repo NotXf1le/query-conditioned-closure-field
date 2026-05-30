@@ -351,6 +351,28 @@ def random_source_key(field: HolographicClosureField, batch: Dict[str, torch.Ten
     return field.key(source, batch["q_rels"], batch["lengths"])
 
 
+def field_alignment_diagnostics(
+    memory: torch.Tensor,
+    target_memory: torch.Tensor,
+    *,
+    eps: float = 1e-12,
+) -> Dict[str, torch.Tensor]:
+    mem_flat = memory.flatten(start_dim=1)
+    target_flat = target_memory.flatten(start_dim=1)
+    mem_norm = mem_flat.norm(dim=1)
+    target_norm = target_flat.norm(dim=1)
+    dot = (mem_flat * target_flat).sum(dim=1)
+    denom = mem_norm * target_norm
+    valid = (mem_norm > eps) & (target_norm > eps)
+    canonical_cos = torch.where(
+        valid,
+        dot / denom.clamp_min(eps),
+        torch.zeros_like(dot),
+    )
+    field_rms = torch.sqrt(mem_flat.pow(2).mean(dim=1).clamp_min(0.0))
+    return {"canonical_cos": canonical_cos, "field_rms": field_rms}
+
+
 def field_supervision_loss(cfg: L1IsolationConfig, field: HolographicClosureField, out: Dict[str, torch.Tensor], target: torch.Tensor) -> torch.Tensor:
     q = out["query_key"]
     oracle = rank_one_target_memory(q, target, cfg.num_entities)
@@ -446,6 +468,8 @@ def evaluate_model(
             "oracle": [0.0, 0.0],
             "wrong_old": [0.0, 0.0],
             "field_mse": [0.0, 0.0],
+            "canonical_cos": [0.0, 0.0],
+            "field_rms": [0.0, 0.0],
         }
         for _ in range(0, int(cfg.eval_n), int(cfg.eval_batch_size)):
             n_batch = min(int(cfg.eval_batch_size), int(cfg.eval_n) - int(counts["writer"][1]))
@@ -468,6 +492,11 @@ def evaluate_model(
             counts["wrong_old"][1] += int(target.numel())
             counts["field_mse"][0] += float(F.mse_loss(out["memory"], oracle_mem, reduction="sum").cpu().item())
             counts["field_mse"][1] += float(out["memory"].numel())
+            diagnostics = field_alignment_diagnostics(out["memory"], oracle_mem)
+            counts["canonical_cos"][0] += float(diagnostics["canonical_cos"].sum().cpu().item())
+            counts["canonical_cos"][1] += float(target.numel())
+            counts["field_rms"][0] += float(diagnostics["field_rms"].sum().cpu().item())
+            counts["field_rms"][1] += float(target.numel())
         row: Dict[str, float | str] = {
             "condition": cfg.condition,
             "length": float(length),
@@ -490,6 +519,8 @@ def evaluate_model(
         row["wrong_key_old_target_rate"] = counts["wrong_old"][0] / max(1.0, counts["wrong_old"][1])
         row["wrong_key_old_target_n"] = counts["wrong_old"][1]
         row["field_mse"] = counts["field_mse"][0] / max(1.0, counts["field_mse"][1])
+        row["canonical_cos"] = counts["canonical_cos"][0] / max(1.0, counts["canonical_cos"][1])
+        row["field_rms"] = counts["field_rms"][0] / max(1.0, counts["field_rms"][1])
         rows.append(row)
         print(json.dumps({"l1_eval": row}, sort_keys=True), flush=True)
     return rows
