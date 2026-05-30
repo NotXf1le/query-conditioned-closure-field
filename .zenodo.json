@@ -13,8 +13,8 @@
     }
   ],
   "license": "MIT",
-  "version": "v1.1.0",
-  "publication_date": "2026-05-19",
+  "version": "v1.2.0",
+  "publication_date": "2026-05-30",
   "keywords": [
     "differentiable memory",
     "vector-symbolic binding",
