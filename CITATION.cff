@@ -10,11 +10,11 @@ authors:
     given-names: "Stevan"
     affiliation: "University of Donja Gorica"
 repository-code: "https://github.com/NotXf1le/query-conditioned-closure-field"
-doi: "10.5281/zenodo.20294661"
-url: "https://doi.org/10.5281/zenodo.20294661"
+doi: "10.5281/zenodo.20459945"
+url: "https://doi.org/10.5281/zenodo.20459945"
 license: MIT
-version: "v1.1.0"
-date-released: "2026-05-19"
+version: "v1.2.0"
+date-released: "2026-05-30"
 abstract: "Reproducibility artifact for query-conditioned closure-field diagnostics under a single-read bottleneck."
 keywords:
   - differentiable memory
